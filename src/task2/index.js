@@ -1,65 +1,62 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, memo, useMemo, useState } from "react";
 
-const HeaderCell = ({name, onClick}) => {
-  return <th onClick={onClick}>{name}</th>
-}
+const HeaderCell = memo(({ name, onClick }) => {
+  return <th onClick={onClick}>{name}</th>;
+});
 
-class Row extends React.Component {
-  render(){
-    return <tr>
-      {this.props.children}
-    </tr>
-  }
-}
+const Row = memo(({ columns, row }) => (
+  <tr>
+    {columns.map((column, columnIdx) =>
+      useMemo(() => (
+        <Cell
+          key={columnIdx}
+          row={row}
+          column={column}
+          styles={column.styles}
+        />
+      ))
+    )}
+  </tr>
+));
+
 class Cell extends PureComponent {
-  render(){
-    const {row, column, styles}= this.props
+  render() {
+    const { row, column, styles } = this.props;
     return (
       <td>
-        { column.structure === 'image' ? <img src={row[column.key]} style={styles} alt={row.name}/> : row[column.key] }
+        {column.structure === "image" ? (
+          <img src={row[column.key]} style={styles} alt={row.name} />
+        ) : (
+          row[column.key]
+        )}
       </td>
-    )
+    );
   }
-
 }
 
-class Table extends PureComponent {
-  state = { highlightEverySecond: false }
-
-  render() {
-    const columns = this.props.columns
-    return (
-      <table className={this.state.highlightEverySecond ? 'highlighted': ''}>
-        <thead>
-          <tr>
-            {
-              columns.map((column, columnIdx) => (
-                <HeaderCell
-                  key={columnIdx}
-                  name={column.name}
-                  onClick={() => this.setState({highlightEverySecond: !this.state.highlightEverySecond}) }
-                />
-              ))
-            }
-          </tr>
-        </thead>
-        <tbody>
-          {this.props.rows.map((row, rowIdx) =>  (
-            <Row key={rowIdx}>
-              {columns.map((column, columnIdx) => (
-              <Cell
-                key={columnIdx}
-                row={row}
-                column={column}
-                styles={column.styles || {}}
-              />
-              ))}
-            </Row>
+const Table = memo(props => {
+  const [highlight, setHighlight] = useState(false);
+  const { columns, rows } = props;
+  return (
+    <table className={highlight ? "highlighted" : ""}>
+      <thead>
+        <tr>
+          {columns.map((column, columnIdx) => (
+            <HeaderCell
+              key={columnIdx}
+              name={column.name}
+              onClick={() => setHighlight(!highlight)}
+            />
           ))}
-        </tbody>
-      </table>
-    )
-  }
-}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, rowIdx) =>
+          useMemo(() => <Row key={rowIdx} columns={columns} row={row} />)
+        )}
+      </tbody>
+    </table>
+  );
+});
 
-export default Table
+export default Table;

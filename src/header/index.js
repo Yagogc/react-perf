@@ -1,14 +1,10 @@
-import React, { Component } from 'react'
-import logo from './conf-logo.png'
-import styled from 'styled-components'
-
-const Div=styled.div``
+import React, { Component } from "react";
+import logo from "./conf-logo.png";
 
 class Header extends Component {
   render() {
     return (
       <header>
-        <Div/>
         <h1>
           <img src={logo} className="App-logo" alt="react-logo" />
           react performance 101
@@ -18,4 +14,4 @@ class Header extends Component {
   }
 }
 
-export default Header
+export default Header;
